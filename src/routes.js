@@ -37,9 +37,12 @@ import NotificationsPage from "views/Notifications/Notifications.js";
 import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 import RTLPage from "views/RTLPage/RTLPage.js";
-import Transactions from "views/Transactions/Transactions";
-import Jobs from "views/Jobs/Jobs";
-import Profiles from "views/Profiles/Profiles";
+import ClientTransactions from "views/Transactions/ClientTransactions";
+import ArtisanTransactions from "views/Transactions/ArtisanTransactions";
+import ClientJobs from "views/Jobs/ClientJobs";
+import ArtisanJobs from "views/Jobs/ArtisanJobs";
+import ClientProfiles from "views/Profiles/ClientProfiles";
+import ArtisanProfiles from "views/Profiles/ArtisanProfiles";
 import RegisterArtisan from "views/RegisterArtisan/RegisterArtisan";
 import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
 
@@ -61,6 +64,30 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
+    path: "/client-profiles",
+    name: "Client Profiles",
+    rtlName: "قائمة الجدول",
+    icon: "eco",
+    component: ClientProfiles,
+    layout: "/admin"
+  },
+  {
+    path: "/client-transactions",
+    name: "Client Transactions",
+    rtlName: "قائمة الجدول",
+    icon: "content_paste",
+    component: ClientTransactions,
+    layout: "/admin"
+  },
+  {
+    path: "/client-jobs",
+    name: "Client Jobs",
+    rtlName: "قائمة الجدول",
+    icon: "rowing",
+    component: ClientJobs,
+    layout: "/admin"
+  },
+  {
     path: "/artisans",
     name: "Artisans",
     rtlName: "قائمة الجدول",
@@ -69,27 +96,27 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/transactions",
-    name: "Transactions",
-    rtlName: "قائمة الجدول",
-    icon: "content_paste",
-    component: Transactions,
-    layout: "/admin"
-  },
-  {
-    path: "/jobs",
-    name: "Jobs",
-    rtlName: "قائمة الجدول",
-    icon: "rowing",
-    component: Jobs,
-    layout: "/admin"
-  },
-  {
-    path: "/profiles",
-    name: "Profiles",
+    path: "/artisan-profiles",
+    name: "Artisan Profiles",
     rtlName: "قائمة الجدول",
     icon: "eco",
-    component: Profiles,
+    component: ArtisanProfiles,
+    layout: "/admin"
+  },
+  {
+    path: "/artisan-transactions",
+    name: "Artisan Transactions",
+    rtlName: "قائمة الجدول",
+    icon: "content_paste",
+    component: ArtisanTransactions,
+    layout: "/admin"
+  },
+  {
+    path: "/artisan-jobs",
+    name: "Artisan Jobs",
+    rtlName: "قائمة الجدول",
+    icon: "rowing",
+    component: ArtisanJobs,
     layout: "/admin"
   },
   {

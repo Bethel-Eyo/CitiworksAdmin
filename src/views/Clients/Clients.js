@@ -57,6 +57,7 @@ export default class Clients extends React.Component {
       message: ""
     };
   }
+
   componentDidMount() {
     axios
       .get("http://citiworksapi.test/users")
@@ -90,11 +91,18 @@ export default class Clients extends React.Component {
             <CardBody>
               <Table
                 tableHeaderColor="primary"
-                tableHead={["client-id", "Name", "Email", "Action"]}
+                tableHead={[
+                  "client-id",
+                  "Name",
+                  "Email",
+                  "Created at",
+                  "Action"
+                ]}
                 tableData={this.state.clients.map((client, index) => [
                   client.id,
                   client.first_name + " " + client.last_name,
                   client.email,
+                  client.created_at,
                   <Button color="primary">Copy ID</Button>
                 ])}
               />

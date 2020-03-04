@@ -8,13 +8,6 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
-import BugReport from "@material-ui/icons/BugReport";
-import Tasks from "components/Tasks/Tasks.js";
-import { bugs, website, server } from "variables/general.js";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
-import Button from "components/CustomButtons/Button.js";
 import axios from "axios";
 
 const styles = {
@@ -49,26 +42,22 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default class Artisans extends React.Component {
+export default class ClientTransactions extends React.Component {
   constructor() {
     super();
     this.state = {
-      artisans: [],
+      transactions: [],
       message: ""
     };
   }
 
-  classes = () => {
-    return useStyles();
-  };
-
   componentDidMount() {
     axios
-      .get("http://citiworksapi.test/artisans")
+      .get("http://citiworksapi.test/user-transactions")
       .then(response => {
         this.setState({
           message: "successful",
-          artisans: response.data.artisans
+          transactions: response.data.userTransactions
         });
         console.log(response.users);
       })
@@ -77,26 +66,43 @@ export default class Artisans extends React.Component {
       });
   }
 
+  classes = () => {
+    return useStyles();
+  };
+
   render() {
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card>
-            <CardHeader color="danger">
-              <h4 className={this.classes.cardTitleWhite}>Artisans Table</h4>
+            <CardHeader color="primary">
+              <h4 className={this.classes.cardTitleWhite}>
+                Client Transactions Table
+              </h4>
               <p className={this.classes.cardCategoryWhite}>
-                This is a list of all the Artisans in Citiworks
+                A list of the transactions carried out by all clients
               </p>
             </CardHeader>
             <CardBody>
               <Table
                 tableHeaderColor="primary"
-                tableHead={["artisan-id", "Name", "Email", "Action"]}
-                tableData={this.state.artisans.map((artisan, index) => [
-                  artisan.id,
-                  artisan.first_name + " " + artisan.last_name,
-                  artisan.email,
-                  <Button color="danger">Copy ID</Button>
+                tableHead={[
+                  "User ID",
+                  "Amount",
+                  "Paid with",
+                  "Status",
+                  "Reference Id",
+                  "Description",
+                  "Created at"
+                ]}
+                tableData={this.state.transactions.map((transaction, index) => [
+                  transaction.user_id,
+                  transaction.amount,
+                  transaction.paid_with,
+                  transaction.status,
+                  transaction.reference_id,
+                  transaction.description,
+                  transaction.created_at
                 ])}
               />
             </CardBody>

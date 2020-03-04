@@ -8,13 +8,6 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
-import BugReport from "@material-ui/icons/BugReport";
-import Tasks from "components/Tasks/Tasks.js";
-import { bugs, website, server } from "variables/general.js";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
-import Button from "components/CustomButtons/Button.js";
 import axios from "axios";
 
 const styles = {
@@ -49,26 +42,22 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default class Artisans extends React.Component {
+export default class ArtisanProfiles extends React.Component {
   constructor() {
     super();
     this.state = {
-      artisans: [],
+      profiles: [],
       message: ""
     };
   }
 
-  classes = () => {
-    return useStyles();
-  };
-
   componentDidMount() {
     axios
-      .get("http://citiworksapi.test/artisans")
+      .get("http://citiworksapi.test/artisan-profiles")
       .then(response => {
         this.setState({
           message: "successful",
-          artisans: response.data.artisans
+          profiles: response.data.artisanprofiles
         });
         console.log(response.users);
       })
@@ -77,26 +66,39 @@ export default class Artisans extends React.Component {
       });
   }
 
+  classes = () => {
+    return useStyles();
+  };
+
   render() {
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card>
             <CardHeader color="danger">
-              <h4 className={this.classes.cardTitleWhite}>Artisans Table</h4>
+              <h4 className={this.classes.cardTitleWhite}>
+                Artisan Profiles Table
+              </h4>
               <p className={this.classes.cardCategoryWhite}>
-                This is a list of all the Artisans in Citiworks
+                A list of the profiles of all artisans
               </p>
             </CardHeader>
             <CardBody>
               <Table
                 tableHeaderColor="primary"
-                tableHead={["artisan-id", "Name", "Email", "Action"]}
-                tableData={this.state.artisans.map((artisan, index) => [
-                  artisan.id,
-                  artisan.first_name + " " + artisan.last_name,
-                  artisan.email,
-                  <Button color="danger">Copy ID</Button>
+                tableHead={[
+                  "Artisan id",
+                  "Phone Number",
+                  "address",
+                  "picture-link",
+                  "gender"
+                ]}
+                tableData={this.state.profiles.map((profile, index) => [
+                  profile.artisan_id,
+                  profile.phone_number,
+                  profile.address,
+                  profile.profile_picture,
+                  profile.gender
                 ])}
               />
             </CardBody>

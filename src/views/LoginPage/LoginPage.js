@@ -42,16 +42,21 @@ export default class LoginPage extends Component {
   handleLogin = e => {
     e.preventDefault();
     // alert(this.state.auth.password);
+    let history = createBrowserHistory();
     axios
       .post("http://citiworksapi.test/api/admin-login", this.state.auth)
       .then(response => {
-        alert("success: " + response.data.token);
+        let appState = {
+          isLoggedIn: true,
+          user_token: response.data.token
+        };
+        localStorage["appState"] = JSON.stringify(appState);
+        alert(appState.isLoggedIn);
+        history.push("/admin/dashboard");
       })
       .catch(error => {
         alert("An error occured! " + error.message);
       });
-    // let history = createBrowserHistory();
-    // history.push("/admin");
   };
 
   handleChange = name => ({ target: { value } }) => {

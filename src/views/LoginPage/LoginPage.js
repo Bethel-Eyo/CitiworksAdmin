@@ -21,10 +21,12 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import { createBrowserHistory } from "history";
 import { TextField } from "@material-ui/core";
 import axios from "axios";
+import { Route, Redirect } from "react-router-dom";
 
 import styles from "assets/jss/material-dashboard-react/views/loginPage.js";
 
 import image from "assets/img/bg7.jpg";
+import Admin from "layouts/Admin";
 
 const useStyles = makeStyles(styles);
 // function intialize() {}
@@ -51,8 +53,9 @@ export default class LoginPage extends Component {
           user_token: response.data.token
         };
         localStorage["appState"] = JSON.stringify(appState);
-        alert(appState.isLoggedIn);
+        // alert(appState.isLoggedIn);
         history.push("/admin/dashboard");
+        window.location.reload();
       })
       .catch(error => {
         alert("An error occured! " + error.message);
@@ -176,7 +179,7 @@ export default class LoginPage extends Component {
                         type="handlelogin"
                         style={{ marginLeft: "30%" }}
                       >
-                        Get started
+                        Login
                       </Button>
                     </CardFooter>
                   </form>

@@ -18,6 +18,7 @@ import Search from "@material-ui/icons/Search";
 // core components
 import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
+import { createBrowserHistory } from "history";
 
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 
@@ -47,6 +48,20 @@ export default function AdminNavbarLinks() {
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
+
+  const handleLogout = () => {
+    handleCloseProfile();
+    let appState = {
+      isLoggedIn: false,
+      user: {}
+    };
+    // save app state with user date in local storage
+    localStorage["appState"] = JSON.stringify(appState);
+    let history = createBrowserHistory();
+    history.push("/login");
+    window.location.reload();
+  };
+
   return (
     <div>
       <div className={classes.searchWrapper}>
@@ -207,7 +222,7 @@ export default function AdminNavbarLinks() {
                     </MenuItem>
                     <Divider light />
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={handleLogout}
                       className={classes.dropdownItem}
                     >
                       Logout

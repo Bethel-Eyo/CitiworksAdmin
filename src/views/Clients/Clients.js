@@ -59,8 +59,14 @@ export default class Clients extends React.Component {
   }
 
   componentDidMount() {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
     axios
-      .get("http://citiworksapi.test/users")
+      .get("http://citiworksapi.test/api/admins/users", {
+        headers: headers
+      })
       .then(response => {
         this.setState({
           message: "successful",
@@ -72,6 +78,16 @@ export default class Clients extends React.Component {
         this.setState({ message: error.message });
       });
   }
+
+  getToken = () => {
+    let state = localStorage["appState"];
+    if (state) {
+      let AppState = JSON.parse(state);
+      if (AppState.isLoggedIn == true) {
+        return AppState.user_token;
+      }
+    }
+  };
 
   classes = () => {
     return useStyles();

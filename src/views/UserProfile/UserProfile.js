@@ -61,7 +61,10 @@ export default class UserProfile extends React.Component {
     position: "",
     gender: "",
     phone_number: "",
-    id: ""
+    id: "",
+    current_password: "",
+    new_password: "",
+    confirm_new_password: ""
   };
 
   componentWillMount() {
@@ -118,34 +121,48 @@ export default class UserProfile extends React.Component {
       });
   };
 
-  onUpdateAdmin = () => {
-    let first_name = this.state.first_name;
-    let last_name = this.state.last_name;
-    let email = this.state.email;
-    alert("i got in");
+  onUpdateAdmin = e => {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
+    e.preventDefault();
+    const admin = {
+      first_name: this.state.first_name,
+      last_name: this.state.last_name,
+      email: this.state.email
+    };
     axios
       .post(
         "http://citiworksapi.test/api/admins/update-admin/" + this.state.id,
-        { first_name, last_name, email }
+        admin,
+        {
+          headers: headers
+        }
       )
       .then(response => {
         alert(response.data.message);
-        this.updateAdminProfile();
+        this.updateAdminProfile(headers);
       })
       .catch(error => {
         alert("An error updating admin's table " + error.message);
       });
   };
 
-  updateAdminProfile = () => {
-    let position = this.state.position;
-    let phone_number = this.state.phone_number;
-    let gender = this.state.gender;
+  updateAdminProfile = headers => {
+    const adminProfile = {
+      position: this.state.position,
+      phone_number: this.state.phone_number,
+      gender: this.state.gender
+    };
     axios
       .post(
         "http://citiworksapi.test/api/admins/update-admin-profile/" +
           this.state.id,
-        { position, phone_number, gender }
+        adminProfile,
+        {
+          headers: headers
+        }
       )
       .then(response => {
         alert(response.data.message);
@@ -155,46 +172,47 @@ export default class UserProfile extends React.Component {
       });
   };
 
+  onChangePassword = e => {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
+    e.preventDefault();
+    const adminPassword = {
+      current_password: this.state.current_password,
+      new_password: this.state.new_password,
+      confirm_new_password: this.state.confirm_new_password
+    };
+    axios
+      .post(
+        "http://citiworksapi.test/api/admins/change-password/" + this.state.id,
+        adminPassword,
+        {
+          headers: headers
+        }
+      )
+      .then(response => {
+        alert(response.data.message);
+      })
+      .catch(error => {
+        alert("An error occured on password change" + error.message);
+      });
+  };
+
   render() {
     return (
       <div>
         <GridContainer>
           <GridItem xs={12} sm={12} md={8}>
             <Card>
-              <CardHeader color="primary">
-                <h4 className={this.classes.cardTitleWhite}>Edit Profile</h4>
-                <p className={this.classes.cardCategoryWhite}>
-                  Complete your profile
-                </p>
-              </CardHeader>
-              <CardBody>
-                <form
-                  className={this.classes.form}
-                  onSubmit={this.onUpdateAdmin}
-                >
-                  {/* <GridContainer>
-                  <GridItem xs={12} sm={12} md={5}>
-                    <CustomInput
-                      labelText="Company (disabled)"
-                      id="company-disabled"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        disabled: true
-                      }}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="Username"
-                      id="username"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                    />
-                  </GridItem>
-                </GridContainer> */}
+              <form className={this.classes.form} onSubmit={this.onUpdateAdmin}>
+                <CardHeader color="primary">
+                  <h4 className={this.classes.cardTitleWhite}>Edit Profile</h4>
+                  <p className={this.classes.cardCategoryWhite}>
+                    Complete your profile
+                  </p>
+                </CardHeader>
+                <CardBody>
                   <GridContainer>
                     <GridItem xs={12} sm={12} md={4}>
                       <TextField
@@ -273,31 +291,13 @@ export default class UserProfile extends React.Component {
                       />
                     </GridItem>
                   </GridContainer>
-                  {/* <GridContainer>
-                  <GridItem xs={12} sm={12} md={12}>
-                    <InputLabel style={{ color: "#AAAAAA" }}>
-                      About me
-                    </InputLabel>
-                    <CustomInput
-                      labelText="Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo."
-                      id="about-me"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        multiline: true,
-                        rows: 5
-                      }}
-                    />
-                  </GridItem>
-                </GridContainer> */}
-                </form>
-              </CardBody>
-              <CardFooter>
-                <Button type="submit" color="primary">
-                  Update Profile
-                </Button>
-              </CardFooter>
+                </CardBody>
+                <CardFooter>
+                  <Button type="submit" color="primary">
+                    Update Profile
+                  </Button>
+                </CardFooter>
+              </form>
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={4}>
@@ -319,10 +319,76 @@ export default class UserProfile extends React.Component {
                   human foundation in truth And I love you like Kanye loves Kanye
                   I love Rick Owens’ bed design but the back is... */}
                 </p>
+                {/* {this.getToken()} */}
                 <Button color="primary" round>
                   Follow
                 </Button>
               </CardBody>
+            </Card>
+          </GridItem>
+          <GridItem xs={12} sm={12} md={8}>
+            <Card>
+              <CardHeader color="rose">
+                <h4 className={this.classes.cardTitleWhite}>Change Password</h4>
+                <p className={this.classes.cardCategoryWhite}>
+                  Remember to use a strong Password
+                </p>
+              </CardHeader>
+              <form
+                className={this.classes.form}
+                onSubmit={this.onChangePassword}
+              >
+                <CardBody>
+                  <GridContainer>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <TextField
+                        id="current_password"
+                        label="Old Password"
+                        variant="outlined"
+                        style={{ width: "100%" }}
+                        onChange={this.handleProfileChange("current_password")}
+                        value={this.state.current_password}
+                        InputProps={{
+                          type: "password"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <TextField
+                        id="new_password"
+                        label="New Password"
+                        variant="outlined"
+                        style={{ width: "100%" }}
+                        onChange={this.handleProfileChange("new_password")}
+                        value={this.state.new_password}
+                        InputProps={{
+                          type: "password"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <TextField
+                        id="confirm_new_password"
+                        label="Confirm new Password"
+                        variant="outlined"
+                        style={{ width: "100%" }}
+                        onChange={this.handleProfileChange(
+                          "confirm_new_password"
+                        )}
+                        value={this.state.confirm_new_password}
+                        InputProps={{
+                          type: "password"
+                        }}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                </CardBody>
+                <CardFooter>
+                  <Button type="submit" color="rose">
+                    Change Password
+                  </Button>
+                </CardFooter>
+              </form>
             </Card>
           </GridItem>
         </GridContainer>

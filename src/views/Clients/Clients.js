@@ -16,6 +16,11 @@ import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 import Button from "components/CustomButtons/Button.js";
 import axios from "axios";
+import CardFooter from "components/Card/CardFooter";
+import { Pagination } from "@material-ui/lab";
+import SearchIcon from "@material-ui/icons/Search";
+import { TextField } from "@material-ui/core";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 const styles = {
   cardCategoryWhite: {
@@ -44,6 +49,14 @@ const styles = {
       fontWeight: "400",
       lineHeight: "1"
     }
+  },
+  ul: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    padding: 0,
+    margin: 0,
+    listStyle: "none"
   }
 };
 
@@ -54,7 +67,13 @@ export default class Clients extends React.Component {
     super();
     this.state = {
       clients: [],
-      message: ""
+      message: "",
+      itemsCountPerPage: 1,
+      totalItemsCount: 1,
+      pageRangeDisplayed: 3,
+      token: "",
+      page: 1,
+      search: ""
     };
   }
 
@@ -70,7 +89,9 @@ export default class Clients extends React.Component {
       .then(response => {
         this.setState({
           message: "successful",
-          clients: response.data.users
+          clients: response.data.users.data,
+          rowsPerPage: response.data.users.per_page,
+          totalItemsCount: response.data.users.to
         });
         console.log(response.users);
       })
@@ -84,76 +105,128 @@ export default class Clients extends React.Component {
     if (state) {
       let AppState = JSON.parse(state);
       if (AppState.isLoggedIn == true) {
+        this.setState({
+          token: AppState.user_token
+        });
         return AppState.user_token;
       }
     }
   };
+
+  setPage(page) {
+    return page + 1;
+  }
+
+  updateSearch = e => {
+    this.setState({
+      search: e.target.value.substr(0, 20)
+    });
+  };
+
+  handleChange(event, value) {
+    this.setPage(value);
+    // alert(value);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.state.token
+    };
+    console.log(`active page is ${value}`);
+    // this.setState({ activePage: page });
+    axios
+      .get("http://citiworksapi.test/api/admins/users?page=" + value, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          clients: response.data.users.data,
+          itemsCountPerPage: response.data.users.per_page,
+          totalItemsCount: response.data.users.last_page,
+          page: response.data.users.current_page
+        });
+      });
+  }
 
   classes = () => {
     return useStyles();
   };
 
   render() {
+    const { page } = this.state;
+    let filteredClients = this.state.clients.filter(client => {
+      return (
+        client.first_name
+          .toLowerCase()
+          .indexOf(this.state.search.toLowerCase()) !== -1
+      );
+    });
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
-          <Card>
-            <CardHeader color="primary">
-              <h4 className={this.classes.cardTitleWhite}>Clients Table</h4>
-              <p className={this.classes.cardCategoryWhite}>
-                This a list of all the clients in Citiworks {this.state.message}
-              </p>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="primary"
-                tableHead={[
-                  "client-id",
-                  "Name",
-                  "Email",
-                  "Created at",
-                  "Action"
-                ]}
-                tableData={this.state.clients.map((client, index) => [
-                  client.id,
-                  client.first_name + " " + client.last_name,
-                  client.email,
-                  client.created_at,
-                  <Button color="primary">Copy ID</Button>
-                ])}
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={4} />
+            <GridItem xs={12} sm={12} md={4} />
+            <GridItem xs={12} sm={12} md={4}>
+              <TextField
+                id="search"
+                label="Search"
+                variant="outlined"
+                // style={{ width: "100%" }}
+                onChange={this.updateSearch}
+                value={this.state.search}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  )
+                }}
               />
-            </CardBody>
-          </Card>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <Card>
+              <CardHeader color="primary">
+                <h4 className={this.classes.cardTitleWhite}>Clients Table</h4>
+                <p className={this.classes.cardCategoryWhite}>
+                  This a list of all the clients in Citiworks{" "}
+                  {this.state.message}
+                </p>
+              </CardHeader>
+              <CardBody>
+                <Table
+                  tableHeaderColor="primary"
+                  tableHead={[
+                    "client-id",
+                    "Name",
+                    "Email",
+                    "Created at",
+                    "Action"
+                  ]}
+                  tableData={filteredClients.map((client, index) => [
+                    client.id,
+                    client.first_name + " " + client.last_name,
+                    client.email,
+                    client.created_at,
+                    <Button color="primary">Copy ID</Button>
+                  ])}
+                />
+              </CardBody>
+              <CardFooter>
+                <div className={this.classes.root}>
+                  <Pagination
+                    page={page}
+                    itemsCountPerPage={this.state.itemsCountPerPage}
+                    count={this.state.totalItemsCount}
+                    pageRangeDisplayed={this.state.pageRangeDisplayed}
+                    onChange={this.handleChange.bind(this)}
+                  />
+                </div>
+                {/* {PaginationControlled()} */}
+              </CardFooter>
+            </Card>
+          </GridContainer>
         </GridItem>
       </GridContainer>
     );
   }
 }
-
-const users = [
-  {
-    id: "987656790",
-    name: "Datoka rice",
-    email: "rice@example.com"
-  },
-  {
-    id: "987656790",
-    name: "Datoka rice",
-    email: "rice@example.com"
-  },
-  {
-    id: "987656790",
-    name: "Datoka rice",
-    email: "rice@example.com"
-  },
-  {
-    id: "987656790",
-    name: "Datoka rice",
-    email: "rice@example.com"
-  },
-  {
-    id: "987656790",
-    name: "Datoka rice",
-    email: "rice@example.com"
-  }
-];

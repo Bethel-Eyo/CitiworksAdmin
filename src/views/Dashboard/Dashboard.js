@@ -30,6 +30,8 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
 import { bugs, website, server } from "variables/general.js";
+import Typography from "@material-ui/core/Typography";
+import { Pagination } from "@material-ui/lab";
 
 import {
   dailySalesChart,
@@ -43,6 +45,12 @@ const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
   const classes = useStyles();
+
+  const [page, setPage] = React.useState(1);
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
+
   return (
     <div>
       <GridContainer>
@@ -121,6 +129,8 @@ export default function Dashboard() {
           </Card>
         </GridItem>
       </GridContainer>
+      <Typography>Page: {page}</Typography>
+      <Pagination count={10} page={page} onChange={handleChange} />
       <GridContainer>
         <GridItem xs={12} sm={12} md={4}>
           {/* <Card chart>

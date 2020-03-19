@@ -319,7 +319,7 @@ export default class UserProfile extends React.Component {
                   human foundation in truth And I love you like Kanye loves Kanye
                   I love Rick Owens’ bed design but the back is... */}
                 </p>
-                {/* {this.getToken()} */}
+                {this.getToken()}
                 <Button color="primary" round>
                   Follow
                 </Button>

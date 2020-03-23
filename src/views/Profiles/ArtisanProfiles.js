@@ -9,6 +9,8 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import axios from "axios";
+import Button from "components/CustomButtons/Button.js";
+import RecipeReviewCard from "components/Card/ComplexCard";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,7 +49,9 @@ export default class ArtisanProfiles extends React.Component {
     super();
     this.state = {
       profiles: [],
-      message: ""
+      message: "",
+      expanded: false,
+      artisan: {}
     };
   }
 
@@ -81,15 +85,32 @@ export default class ArtisanProfiles extends React.Component {
       }
     }
   };
+  a;
+
+  getDetails = index => {
+    // alert(index);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
+    axios
+      .get("http://citiworksapi.test/api/admins/artisan/" + index, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          artisan: response.data.artisan
+        });
+      });
+  };
 
   classes = () => {
     return useStyles();
   };
-
   render() {
     return (
       <GridContainer>
-        <GridItem xs={12} sm={12} md={12}>
+        <GridItem xs={12} sm={12} md={8}>
           <Card>
             <CardHeader color="danger">
               <h4 className={this.classes.cardTitleWhite}>
@@ -102,23 +123,30 @@ export default class ArtisanProfiles extends React.Component {
             <CardBody>
               <Table
                 tableHeaderColor="primary"
-                tableHead={[
-                  "Artisan id",
-                  "Phone Number",
-                  "address",
-                  "picture-link",
-                  "gender"
-                ]}
+                tableHead={["Artisan id", "address", "Action"]}
                 tableData={this.state.profiles.map((profile, index) => [
                   profile.artisan_id,
-                  profile.phone_number,
                   profile.address,
-                  profile.profile_picture,
-                  profile.gender
+                  <Button
+                    color="rose"
+                    onClick={() => this.getDetails(profile.artisan_id)}
+                  >
+                    View Details
+                  </Button>
+                  // <img
+                  //   // src="http://bit.ly/2WjUOvx"
+                  //   src={profile.profile_picture}
+                  //   width="50"
+                  //   height="50"
+                  //   alt="..."
+                  // />
                 ])}
               />
             </CardBody>
           </Card>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={4}>
+          <RecipeReviewCard name={this.state.artisan.first_name} />
         </GridItem>
       </GridContainer>
     );

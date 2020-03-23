@@ -112,18 +112,16 @@ export default class RegisterArtisan extends React.Component {
       password: "",
       password_confirmation: ""
     },
-    artisanProfile: {
-      phone_number: "",
-      area: "",
-      city: "",
-      country: "",
-      bank_name: "",
-      gender: "",
-      account_number: "",
-      qualification: "",
-      cert_file: "",
-      profile_picture: ""
-    },
+    phone_number: "",
+    area: "",
+    city: "",
+    country: "",
+    bank_name: "",
+    gender: "",
+    account_number: "",
+    qualification: "",
+    cert_file: "",
+    profile_picture: "",
     imagePreviewUrl: avatar,
     filePreviewUrl: null,
     artisan_id: ""
@@ -140,10 +138,7 @@ export default class RegisterArtisan extends React.Component {
 
   handleProfileChange = name => ({ target: { value } }) => {
     this.setState({
-      artisanProfile: {
-        ...this.state.artisanProfile,
-        [name]: value
-      }
+      [name]: value
     });
   };
 
@@ -153,10 +148,7 @@ export default class RegisterArtisan extends React.Component {
 
   fileChangeHandler = event => {
     this.setState({
-      artisanProfile: {
-        ...this.state.artisanProfile,
-        profile_picture: event.target.files[0]
-      }
+      profile_picture: event.target.files[0]
     });
 
     let reader = new FileReader();
@@ -172,10 +164,7 @@ export default class RegisterArtisan extends React.Component {
 
   fileUploadHandler = event => {
     this.setState({
-      artisanProfile: {
-        ...this.state.artisanProfile,
-        cert_file: event.target.files[0]
-      }
+      cert_file: event.target.files[0]
     });
 
     let reader = new FileReader();
@@ -228,18 +217,60 @@ export default class RegisterArtisan extends React.Component {
       });
   };
 
+  storeImage = () => {
+    console.log(this.state.profile_picture);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
+    const artisanProfile = {
+      phone_number: this.state.phone_number,
+      area: this.state.area,
+      city: this.state.city,
+      country: this.state.country,
+      bank_name: this.state.bank_name,
+      account_number: this.state.account_number,
+      qualification: this.state.qualification,
+      gender: this.state.gender,
+      profile_picture: this.state.imagePreviewUrl,
+      cert_file: this.state.filePreviewUrl
+    };
+    axios
+      .post("http://citiworksapi.test/api/admins/store", artisanProfile, {
+        headers: headers
+      })
+      .then(response => {
+        alert(response.data.message);
+      })
+      .catch(error => {
+        alert("An error occured on saving image " + error.message);
+      });
+  };
+
   createProfile = headers => {
+    const artisanProfile = {
+      phone_number: this.state.phone_number,
+      area: this.state.area,
+      city: this.state.city,
+      country: this.state.country,
+      bank_name: this.state.bank_name,
+      account_number: this.state.account_number,
+      qualification: this.state.qualification,
+      gender: this.state.gender,
+      profile_picture: this.state.imagePreviewUrl,
+      cert_file: this.state.filePreviewUrl
+    };
     axios
       .post(
         "http://citiworksapi.test/api/admins/create-artisan-profile/" +
           this.state.artisan_id,
-        this.state.artisanProfile,
+        artisanProfile,
         {
           headers: headers
         }
       )
       .then(response => {
-        alert("id: " + this.state.artisanProfile.artisan_id);
+        alert("id: " + artisanProfile.artisan_id);
         alert(response.data.message);
       })
       .catch(error => {
@@ -253,16 +284,14 @@ export default class RegisterArtisan extends React.Component {
     } = this.state;
 
     const {
-      artisanProfile: {
-        phone_number,
-        area,
-        city,
-        country,
-        bank_name,
-        account_number,
-        qualification,
-        gender
-      }
+      phone_number,
+      area,
+      city,
+      country,
+      bank_name,
+      account_number,
+      qualification,
+      gender
     } = this.state;
 
     let $filePreview = (
@@ -469,7 +498,7 @@ export default class RegisterArtisan extends React.Component {
                       value={password_confirmation}
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={2}>
+                  <GridItem xs={12} sm={12} md={3}>
                     <div style={{ marginTop: 60, marginLeft: 30 }}>
                       <input
                         accept="image/*"
@@ -490,12 +519,24 @@ export default class RegisterArtisan extends React.Component {
                       </label>
                     </div>
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={2}>
+                  <GridItem xs={12} sm={12} md={3}>
                     <CardAvatar profile>
                       <img src={this.state.imagePreviewUrl} alt="..." />
                     </CardAvatar>
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={2}>
+                  {/* <GridItem xs={12} sm={12} md={3}>
+                    <Button
+                      variant="contained"
+                      color="rose"
+                      component="span"
+                      onClick={this.storeImage}
+                    >
+                      Store
+                    </Button>
+                  </GridItem> */}
+                </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={3}>
                     <div style={{ marginTop: 60 }}>
                       <input
                         accept="image/*"

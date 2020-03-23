@@ -21,6 +21,9 @@ import { Pagination } from "@material-ui/lab";
 import SearchIcon from "@material-ui/icons/Search";
 import { TextField } from "@material-ui/core";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
+import copy from "copy-to-clipboard";
 
 const styles = {
   cardCategoryWhite: {
@@ -73,7 +76,10 @@ export default class Clients extends React.Component {
       pageRangeDisplayed: 3,
       token: "",
       page: 1,
-      search: ""
+      search: "",
+      tc: false,
+      clientID: "",
+      firstName: ""
     };
   }
 
@@ -146,12 +152,40 @@ export default class Clients extends React.Component {
       });
   }
 
+  showNotification = place => {
+    switch (place) {
+      case "tc":
+        if (!this.state.tc) {
+          this.setState({
+            tc: true
+          });
+          setTimeout(() => {
+            this.setState({
+              tc: false
+            });
+          }, 6000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  copyClientID = (id, name) => {
+    this.setState({
+      clientID: id,
+      firstName: name
+    });
+    copy(id);
+    this.showNotification("tc");
+  };
+
   classes = () => {
     return useStyles();
   };
 
   render() {
-    const { page } = this.state;
+    const { page, tc } = this.state;
     let filteredClients = this.state.clients.filter(client => {
       return (
         client.first_name
@@ -207,7 +241,14 @@ export default class Clients extends React.Component {
                     client.first_name + " " + client.last_name,
                     client.email,
                     client.created_at,
-                    <Button color="primary">Copy ID</Button>
+                    <Button
+                      color="primary"
+                      onClick={() =>
+                        this.copyClientID(client.id, client.first_name)
+                      }
+                    >
+                      Copy ID
+                    </Button>
                   ])}
                 />
               </CardBody>
@@ -223,6 +264,25 @@ export default class Clients extends React.Component {
                 </div>
                 {/* {PaginationControlled()} */}
               </CardFooter>
+              <Snackbar
+                place="tc"
+                color="rose"
+                icon={AddAlert}
+                message={
+                  "You have Successfully copied " +
+                  this.state.firstName +
+                  "'s id: " +
+                  this.state.clientID +
+                  " to your clipboard"
+                }
+                open={tc}
+                closeNotification={() => {
+                  this.setState({
+                    tc: false
+                  });
+                }}
+                close
+              />
             </Card>
           </GridContainer>
         </GridItem>

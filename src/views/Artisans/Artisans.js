@@ -16,6 +16,11 @@ import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 import Button from "components/CustomButtons/Button.js";
 import axios from "axios";
+import { Pagination } from "@material-ui/lab";
+import CardFooter from "components/Card/CardFooter";
+import { TextField } from "@material-ui/core";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import SearchIcon from "@material-ui/icons/Search";
 
 const styles = {
   cardCategoryWhite: {
@@ -54,7 +59,13 @@ export default class Artisans extends React.Component {
     super();
     this.state = {
       artisans: [],
-      message: ""
+      message: "",
+      itemsCountPerPage: 1,
+      totalItemsCount: 1,
+      pageRangeDisplayed: 3,
+      token: "",
+      search: "",
+      page: 1
     };
   }
 
@@ -74,7 +85,9 @@ export default class Artisans extends React.Component {
       .then(response => {
         this.setState({
           message: "successful",
-          artisans: response.data.artisans
+          artisans: response.data.artisans.data,
+          rowsPerPage: response.data.artisans.per_page,
+          totalItemsCount: response.data.artisans.last_page
         });
         console.log(response.users);
       })
@@ -88,15 +101,82 @@ export default class Artisans extends React.Component {
     if (state) {
       let AppState = JSON.parse(state);
       if (AppState.isLoggedIn == true) {
+        this.setState({
+          token: AppState.user_token
+        });
         return AppState.user_token;
       }
     }
   };
 
+  setPage(page) {
+    return page + 1;
+  }
+
+  updateSearch = e => {
+    this.setState({
+      search: e.target.value.substr(0, 20)
+    });
+  };
+
+  handleChange(event, value) {
+    this.setPage(value);
+    // alert(value);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.state.token
+    };
+    console.log(`active page is ${value}`);
+    // this.setState({ activePage: page });
+    axios
+      .get("http://citiworksapi.test/api/admins/artisans?page=" + value, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          artisans: response.data.artisans.data,
+          itemsCountPerPage: response.data.artisans.per_page,
+          totalItemsCount: response.data.artisans.last_page,
+          page: response.data.artisans.current_page
+        });
+      });
+  }
+
   render() {
+    const { page } = this.state;
+
+    let filteredArtisans = this.state.artisans.filter(artisan => {
+      return (
+        artisan.first_name
+          .toLowerCase()
+          .indexOf(this.state.search.toLowerCase()) !== -1
+      );
+    });
+
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={4} />
+            <GridItem xs={12} sm={12} md={4} />
+            <GridItem xs={12} sm={12} md={4}>
+              <TextField
+                id="search"
+                label="Search"
+                variant="outlined"
+                // style={{ width: "100%" }}
+                onChange={this.updateSearch}
+                value={this.state.search}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
           <Card>
             <CardHeader color="danger">
               <h4 className={this.classes.cardTitleWhite}>Artisans Table</h4>
@@ -108,7 +188,7 @@ export default class Artisans extends React.Component {
               <Table
                 tableHeaderColor="primary"
                 tableHead={["artisan-id", "Name", "Email", "Action"]}
-                tableData={this.state.artisans.map((artisan, index) => [
+                tableData={filteredArtisans.map((artisan, index) => [
                   artisan.id,
                   artisan.first_name + " " + artisan.last_name,
                   artisan.email,
@@ -116,6 +196,17 @@ export default class Artisans extends React.Component {
                 ])}
               />
             </CardBody>
+            <CardFooter>
+              <div className={this.classes.root}>
+                <Pagination
+                  page={page}
+                  itemsCountPerPage={this.state.itemsCountPerPage}
+                  count={this.state.totalItemsCount}
+                  pageRangeDisplayed={this.state.pageRangeDisplayed}
+                  onChange={this.handleChange.bind(this)}
+                />
+              </div>
+            </CardFooter>
           </Card>
         </GridItem>
       </GridContainer>

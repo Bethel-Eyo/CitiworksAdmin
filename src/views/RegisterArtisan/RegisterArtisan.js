@@ -14,8 +14,14 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import TextField from "@material-ui/core/TextField";
 import axios from "axios";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 import avatar from "assets/img/faces/marc.jpg";
+import CircularIndeterminate from "components/Specials/CircularProgress";
 
 const styles = {
   cardCategoryWhite: {
@@ -103,6 +109,37 @@ const certificates = [
   }
 ];
 
+const categories = [
+  {
+    value: " ",
+    label: " "
+  },
+  {
+    value: "Carpentry",
+    label: "Carpentry"
+  },
+  {
+    value: "Cleaning",
+    label: "Cleaning"
+  },
+  {
+    value: "Electrical and Electronics",
+    label: "Electrical and Electronics"
+  },
+  {
+    value: "Plumbing",
+    label: "Plumbing"
+  },
+  {
+    value: "Painting",
+    label: "Painting"
+  },
+  {
+    value: "Masonry",
+    label: "Masonry"
+  }
+];
+
 export default class RegisterArtisan extends React.Component {
   state = {
     artisan: {
@@ -124,7 +161,12 @@ export default class RegisterArtisan extends React.Component {
     profile_picture: "",
     imagePreviewUrl: avatar,
     filePreviewUrl: null,
-    artisan_id: ""
+    artisan_id: "",
+    category: "",
+    dialog: false,
+    messageTitle: "",
+    messageBody: "",
+    isLoading: false
   };
 
   handleChange = name => ({ target: { value } }) => {
@@ -195,7 +237,9 @@ export default class RegisterArtisan extends React.Component {
       "Content-Type": "application/json",
       Authorization: "Bearer " + this.getToken()
     };
-
+    this.setState({
+      isLoading: false
+    });
     axios
       .post(
         "http://citiworksapi.test/api/admins/register-artisan",
@@ -205,45 +249,25 @@ export default class RegisterArtisan extends React.Component {
         }
       )
       .then(response => {
-        alert(response.data.message);
+        // alert(response.data.message);
         let id = response.data.data.id;
         this.setState({
           artisan_id: id
         });
+        this.setState({
+          messageTitle: "success",
+          messageBody: response.data.message
+        });
         this.createProfile(headers);
       })
       .catch(error => {
+        this.setState({
+          messageTitle: "Error",
+          messageBody: "An error occured on artisan create " + error.message,
+          isLoading: false
+        });
+        this.handleClickOpen();
         alert("An error occured on artisan create " + error.message);
-      });
-  };
-
-  storeImage = () => {
-    console.log(this.state.profile_picture);
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + this.getToken()
-    };
-    const artisanProfile = {
-      phone_number: this.state.phone_number,
-      area: this.state.area,
-      city: this.state.city,
-      country: this.state.country,
-      bank_name: this.state.bank_name,
-      account_number: this.state.account_number,
-      qualification: this.state.qualification,
-      gender: this.state.gender,
-      profile_picture: this.state.imagePreviewUrl,
-      cert_file: this.state.filePreviewUrl
-    };
-    axios
-      .post("http://citiworksapi.test/api/admins/store", artisanProfile, {
-        headers: headers
-      })
-      .then(response => {
-        alert(response.data.message);
-      })
-      .catch(error => {
-        alert("An error occured on saving image " + error.message);
       });
   };
 
@@ -258,8 +282,12 @@ export default class RegisterArtisan extends React.Component {
       qualification: this.state.qualification,
       gender: this.state.gender,
       profile_picture: this.state.imagePreviewUrl,
-      cert_file: this.state.filePreviewUrl
+      cert_file: this.state.filePreviewUrl,
+      category: this.state.category
     };
+    this.setState({
+      isLoading: true
+    });
     axios
       .post(
         "http://citiworksapi.test/api/admins/create-artisan-profile/" +
@@ -270,12 +298,41 @@ export default class RegisterArtisan extends React.Component {
         }
       )
       .then(response => {
-        alert("id: " + artisanProfile.artisan_id);
-        alert(response.data.message);
+        this.setState({
+          messageTitle: "Success",
+          messageBody: response.data.message,
+          isLoading: false
+        });
+        this.handleClickOpen();
       })
       .catch(error => {
-        alert("An error occured on artisan profile create " + error.message);
+        this.setState({
+          messageTitle: "Error",
+          messageBody:
+            "An error occured on artisan profile create " + error.message,
+          isLoading: false
+        });
+        this.handleClickOpen();
       });
+  };
+
+  handleClickOpen = () => {
+    this.setState({
+      dialog: true
+    });
+  };
+
+  handleClose = () => {
+    if (this.state.messageTitle == "Success") {
+      this.setState({
+        dialog: false
+      });
+      window.location.reload();
+    } else {
+      this.setState({
+        dialog: false
+      });
+    }
   };
 
   render() {
@@ -291,7 +348,9 @@ export default class RegisterArtisan extends React.Component {
       bank_name,
       account_number,
       qualification,
-      gender
+      gender,
+      category,
+      dialog
     } = this.state;
 
     let $filePreview = (
@@ -493,10 +552,31 @@ export default class RegisterArtisan extends React.Component {
                       label="Password"
                       variant="outlined"
                       type="password_confirmation"
-                      style={{ width: "100%" }}
+                      style={{ width: "100%", marginLeft: 20 }}
                       onChange={this.handleChange("password_confirmation")}
                       value={password_confirmation}
                     />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <TextField
+                      style={{ width: "100%" }}
+                      id="category"
+                      select
+                      label="Category"
+                      value={category}
+                      onChange={this.handleProfileChange("category")}
+                      SelectProps={{
+                        native: true
+                      }}
+                      helperText="Select Category"
+                      variant="filled"
+                    >
+                      {categories.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </TextField>
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
                     <div style={{ marginTop: 60, marginLeft: 30 }}>
@@ -524,20 +604,10 @@ export default class RegisterArtisan extends React.Component {
                       <img src={this.state.imagePreviewUrl} alt="..." />
                     </CardAvatar>
                   </GridItem>
-                  {/* <GridItem xs={12} sm={12} md={3}>
-                    <Button
-                      variant="contained"
-                      color="rose"
-                      component="span"
-                      onClick={this.storeImage}
-                    >
-                      Store
-                    </Button>
-                  </GridItem> */}
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={3}>
-                    <div style={{ marginTop: 60 }}>
+                    <div style={{ marginTop: 60, paddingLeft: 20 }}>
                       <input
                         accept="image/*"
                         className={this.classes.input}
@@ -563,7 +633,40 @@ export default class RegisterArtisan extends React.Component {
                 </GridContainer>
                 <CardFooter>
                   <GridContainer xs={12} sm={12} md={12}>
-                    <GridItem xs={12} sm={12} md={9}></GridItem>
+                    <GridItem xs={12} sm={12} md={7}>
+                      <div>
+                        <Dialog
+                          open={dialog}
+                          onClose={this.handleClose}
+                          aria-labelledby="alert-dialog-title"
+                          aria-describedby="alert-dialog-description"
+                        >
+                          <DialogTitle id="alert-dialog-title">
+                            {this.state.messageTitle}
+                          </DialogTitle>
+                          <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                              {this.state.messageBody}
+                            </DialogContentText>
+                          </DialogContent>
+                          <DialogActions>
+                            {/* <Button onClick={this.handleClose} color="primary">
+                              Disagree
+                            </Button> */}
+                            <Button
+                              onClick={this.handleClose}
+                              color="primary"
+                              autoFocus
+                            >
+                              Okay
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
+                      </div>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={2}>
+                      {this.state.isLoading ? <CircularIndeterminate /> : null}
+                    </GridItem>
                     <GridItem xs={12} sm={12} md={3}>
                       <Button
                         type="submit"

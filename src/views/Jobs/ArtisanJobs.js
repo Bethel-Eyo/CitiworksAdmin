@@ -9,6 +9,8 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import axios from "axios";
+import { Pagination } from "@material-ui/lab";
+import CardFooter from "components/Card/CardFooter";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,7 +49,12 @@ export default class ArtisanJobs extends React.Component {
     super();
     this.state = {
       jobs: [],
-      message: ""
+      message: "",
+      itemsCountPerPage: 1,
+      totalItemsCount: 1,
+      pageRangeDisplayed: 3,
+      token: "",
+      page: 1
     };
   }
 
@@ -63,7 +70,9 @@ export default class ArtisanJobs extends React.Component {
       .then(response => {
         this.setState({
           message: "successful",
-          jobs: response.data.jobs
+          jobs: response.data.jobs.data,
+          rowsPerPage: response.data.jobs.per_page,
+          totalItemsCount: response.data.jobs.last_page
         });
         console.log(response.users);
       })
@@ -77,16 +86,47 @@ export default class ArtisanJobs extends React.Component {
     if (state) {
       let AppState = JSON.parse(state);
       if (AppState.isLoggedIn == true) {
+        this.setState({
+          token: AppState.user_token
+        });
         return AppState.user_token;
       }
     }
   };
+
+  setPage(page) {
+    return page + 1;
+  }
+
+  handleChange(event, value) {
+    this.setPage(value);
+    // alert(value);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.state.token
+    };
+    console.log(`active page is ${value}`);
+    // this.setState({ activePage: page });
+    axios
+      .get("http://citiworksapi.test/api/admins/artisan-jobs?page=" + value, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          jobs: response.data.jobs.data,
+          itemsCountPerPage: response.data.jobs.per_page,
+          totalItemsCount: response.data.jobs.last_page,
+          page: response.data.jobs.current_page
+        });
+      });
+  }
 
   classes = () => {
     return useStyles();
   };
 
   render() {
+    const { page } = this.state;
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
@@ -128,6 +168,17 @@ export default class ArtisanJobs extends React.Component {
                 ])}
               />
             </CardBody>
+            <CardFooter>
+              <div className={this.classes.root}>
+                <Pagination
+                  page={page}
+                  itemsCountPerPage={this.state.itemsCountPerPage}
+                  count={this.state.totalItemsCount}
+                  pageRangeDisplayed={this.state.pageRangeDisplayed}
+                  onChange={this.handleChange.bind(this)}
+                />
+              </div>
+            </CardFooter>
           </Card>
         </GridItem>
       </GridContainer>

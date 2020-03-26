@@ -97,7 +97,7 @@ export default class Clients extends React.Component {
           message: "successful",
           clients: response.data.users.data,
           rowsPerPage: response.data.users.per_page,
-          totalItemsCount: response.data.users.to
+          totalItemsCount: response.data.users.last_page
         });
         console.log(response.users);
       })

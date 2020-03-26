@@ -11,6 +11,8 @@ import CardBody from "components/Card/CardBody.js";
 import axios from "axios";
 import Button from "components/CustomButtons/Button.js";
 import RecipeReviewCard from "components/Card/ComplexCard";
+import { Pagination } from "@material-ui/lab";
+import CardFooter from "components/Card/CardFooter";
 
 const styles = {
   cardCategoryWhite: {
@@ -51,7 +53,22 @@ export default class ArtisanProfiles extends React.Component {
       profiles: [],
       message: "",
       expanded: false,
-      artisan: {}
+      artisan: {},
+      address: "",
+      bankName: "",
+      qualification: "",
+      phoneNumber: "",
+      gender: "",
+      accountNo: "",
+      profilePix: "",
+      category: "",
+      gender: "",
+      certificate: "",
+      itemsCountPerPage: 1,
+      totalItemsCount: 1,
+      pageRangeDisplayed: 3,
+      token: "",
+      page: 1
     };
   }
 
@@ -67,7 +84,9 @@ export default class ArtisanProfiles extends React.Component {
       .then(response => {
         this.setState({
           message: "successful",
-          profiles: response.data.artisanprofiles
+          profiles: response.data.artisanprofiles.data,
+          rowsPerPage: response.data.artisanprofiles.per_page,
+          totalItemsCount: response.data.artisanprofiles.last_page
         });
         console.log(response.users);
       })
@@ -81,22 +100,40 @@ export default class ArtisanProfiles extends React.Component {
     if (state) {
       let AppState = JSON.parse(state);
       if (AppState.isLoggedIn == true) {
+        this.setState({
+          token: AppState.user_token
+        });
         return AppState.user_token;
       }
     }
   };
   a;
 
-  getDetails = index => {
-    // alert(index);
+  getDetails = profile => {
+    // alert(id);
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + this.getToken()
     };
+    this.setState({
+      address: profile.address,
+      bankName: profile.bank_name,
+      qualification: profile.qualification,
+      phoneNumber: profile.phone_number,
+      gender: profile.gender,
+      accountNo: profile.account_number,
+      profilePix: profile.profile_picture,
+      category: profile.category,
+      gender: profile.gender,
+      certificate: profile.cert_file
+    });
     axios
-      .get("http://citiworksapi.test/api/admins/artisan/" + index, {
-        headers: headers
-      })
+      .get(
+        "http://citiworksapi.test/api/admins/artisan/" + profile.artisan_id,
+        {
+          headers: headers
+        }
+      )
       .then(response => {
         this.setState({
           artisan: response.data.artisan
@@ -104,10 +141,41 @@ export default class ArtisanProfiles extends React.Component {
       });
   };
 
+  setPage(page) {
+    return page + 1;
+  }
+
+  handleChange(event, value) {
+    this.setPage(value);
+    // alert(value);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.state.token
+    };
+    console.log(`active page is ${value}`);
+    // this.setState({ activePage: page });
+    axios
+      .get(
+        "http://citiworksapi.test/api/admins/artisan-profiles?page=" + value,
+        {
+          headers: headers
+        }
+      )
+      .then(response => {
+        this.setState({
+          profiles: response.data.artisanprofiles.data,
+          itemsCountPerPage: response.data.artisanprofiles.per_page,
+          totalItemsCount: response.data.artisanprofiles.last_page,
+          page: response.data.artisanprofiles.current_page
+        });
+      });
+  }
+
   classes = () => {
     return useStyles();
   };
   render() {
+    const { page } = this.state;
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={8}>
@@ -127,26 +195,43 @@ export default class ArtisanProfiles extends React.Component {
                 tableData={this.state.profiles.map((profile, index) => [
                   profile.artisan_id,
                   profile.address,
-                  <Button
-                    color="rose"
-                    onClick={() => this.getDetails(profile.artisan_id)}
-                  >
+                  <Button color="rose" onClick={() => this.getDetails(profile)}>
                     View Details
                   </Button>
-                  // <img
-                  //   // src="http://bit.ly/2WjUOvx"
-                  //   src={profile.profile_picture}
-                  //   width="50"
-                  //   height="50"
-                  //   alt="..."
-                  // />
                 ])}
               />
             </CardBody>
+            <CardFooter>
+              <div className={this.classes.root}>
+                <Pagination
+                  page={page}
+                  itemsCountPerPage={this.state.itemsCountPerPage}
+                  count={this.state.totalItemsCount}
+                  pageRangeDisplayed={this.state.pageRangeDisplayed}
+                  onChange={this.handleChange.bind(this)}
+                />
+              </div>
+            </CardFooter>
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
-          <RecipeReviewCard name={this.state.artisan.first_name} />
+          <RecipeReviewCard
+            name={
+              this.state.artisan.first_name + " " + this.state.artisan.last_name
+            }
+            createdAt={this.state.artisan.created_at}
+            id={this.state.artisan.id}
+            email={this.state.artisan.email}
+            dp={this.state.profilePix}
+            category={this.state.category}
+            gender={this.state.gender}
+            qualification={this.state.qualification}
+            phoneNumber={this.state.phoneNumber}
+            accountNumber={this.state.accountNo}
+            bankName={this.state.bankName}
+            certificate={this.state.certificate}
+            address={this.state.address}
+          />
         </GridItem>
       </GridContainer>
     );

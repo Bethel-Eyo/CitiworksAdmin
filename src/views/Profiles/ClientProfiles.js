@@ -9,6 +9,8 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import axios from "axios";
+import { Pagination } from "@material-ui/lab";
+import CardFooter from "components/Card/CardFooter";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,7 +49,12 @@ export default class ClientProfiles extends React.Component {
     super();
     this.state = {
       profiles: [],
-      message: ""
+      message: "",
+      itemsCountPerPage: 1,
+      totalItemsCount: 1,
+      pageRangeDisplayed: 3,
+      token: "",
+      page: 1
     };
   }
 
@@ -63,7 +70,9 @@ export default class ClientProfiles extends React.Component {
       .then(response => {
         this.setState({
           message: "successful",
-          profiles: response.data.userprofiles
+          profiles: response.data.userprofiles.data,
+          rowsPerPage: response.data.userprofiles.per_page,
+          totalItemsCount: response.data.userprofiles.last_page
         });
         console.log(response.users);
       })
@@ -77,16 +86,48 @@ export default class ClientProfiles extends React.Component {
     if (state) {
       let AppState = JSON.parse(state);
       if (AppState.isLoggedIn == true) {
+        this.setState({
+          token: AppState.user_token
+        });
         return AppState.user_token;
       }
     }
   };
+
+  setPage(page) {
+    return page + 1;
+  }
+
+  handleChange(event, value) {
+    this.setPage(value);
+    // alert(value);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.state.token
+    };
+    console.log(`active page is ${value}`);
+    // this.setState({ activePage: page });
+    axios
+      .get("http://citiworksapi.test/api/admins/user-profiles?page=" + value, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          profiles: response.data.userprofiles.data,
+          itemsCountPerPage: response.data.userprofiles.per_page,
+          totalItemsCount: response.data.userprofiles.last_page,
+          page: response.data.userprofiles.current_page
+        });
+      });
+  }
 
   classes = () => {
     return useStyles();
   };
 
   render() {
+    const { page } = this.state;
+
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
@@ -118,6 +159,17 @@ export default class ClientProfiles extends React.Component {
                 ])}
               />
             </CardBody>
+            <CardFooter>
+              <div className={this.classes.root}>
+                <Pagination
+                  page={page}
+                  itemsCountPerPage={this.state.itemsCountPerPage}
+                  count={this.state.totalItemsCount}
+                  pageRangeDisplayed={this.state.pageRangeDisplayed}
+                  onChange={this.handleChange.bind(this)}
+                />
+              </div>
+            </CardFooter>
           </Card>
         </GridItem>
       </GridContainer>

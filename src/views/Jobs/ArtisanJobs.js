@@ -11,6 +11,7 @@ import CardBody from "components/Card/CardBody.js";
 import axios from "axios";
 import { Pagination } from "@material-ui/lab";
 import CardFooter from "components/Card/CardFooter";
+import Domain from "components/Constants/Keys";
 
 const styles = {
   cardCategoryWhite: {
@@ -64,7 +65,7 @@ export default class ArtisanJobs extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/artisan-jobs", {
+      .get(Domain + "api/admins/artisan-jobs", {
         headers: headers
       })
       .then(response => {
@@ -108,7 +109,7 @@ export default class ArtisanJobs extends React.Component {
     console.log(`active page is ${value}`);
     // this.setState({ activePage: page });
     axios
-      .get("http://citiworksapi.test/api/admins/artisan-jobs?page=" + value, {
+      .get(Domain + "api/admins/artisan-jobs?page=" + value, {
         headers: headers
       })
       .then(response => {

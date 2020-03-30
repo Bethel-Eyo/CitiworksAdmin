@@ -21,6 +21,7 @@ import CardFooter from "components/Card/CardFooter";
 import { TextField } from "@material-ui/core";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
+import Domain from "components/Constants/Keys";
 
 const styles = {
   cardCategoryWhite: {
@@ -79,7 +80,7 @@ export default class Artisans extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/artisans", {
+      .get(Domain + "api/admins/artisans", {
         headers: headers
       })
       .then(response => {
@@ -129,7 +130,7 @@ export default class Artisans extends React.Component {
     console.log(`active page is ${value}`);
     // this.setState({ activePage: page });
     axios
-      .get("http://citiworksapi.test/api/admins/artisans?page=" + value, {
+      .get(Domain + "api/admins/artisans?page=" + value, {
         headers: headers
       })
       .then(response => {

@@ -22,6 +22,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 import avatar from "assets/img/faces/marc.jpg";
 import CircularIndeterminate from "components/Specials/CircularProgress";
+import Domain from "components/Constants/Keys";
 
 const styles = {
   cardCategoryWhite: {
@@ -241,13 +242,9 @@ export default class RegisterArtisan extends React.Component {
       isLoading: false
     });
     axios
-      .post(
-        "http://citiworksapi.test/api/admins/register-artisan",
-        this.state.artisan,
-        {
-          headers: headers
-        }
-      )
+      .post(Domain + "api/admins/register-artisan", this.state.artisan, {
+        headers: headers
+      })
       .then(response => {
         // alert(response.data.message);
         let id = response.data.data.id;
@@ -290,8 +287,7 @@ export default class RegisterArtisan extends React.Component {
     });
     axios
       .post(
-        "http://citiworksapi.test/api/admins/create-artisan-profile/" +
-          this.state.artisan_id,
+        Domain + "api/admins/create-artisan-profile/" + this.state.artisan_id,
         artisanProfile,
         {
           headers: headers

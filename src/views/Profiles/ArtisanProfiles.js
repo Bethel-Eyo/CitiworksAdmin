@@ -13,6 +13,7 @@ import Button from "components/CustomButtons/Button.js";
 import RecipeReviewCard from "components/Card/ComplexCard";
 import { Pagination } from "@material-ui/lab";
 import CardFooter from "components/Card/CardFooter";
+import Domain from "components/Constants/Keys";
 
 const styles = {
   cardCategoryWhite: {
@@ -78,7 +79,7 @@ export default class ArtisanProfiles extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/artisan-profiles", {
+      .get(Domain + "api/admins/artisan-profiles", {
         headers: headers
       })
       .then(response => {
@@ -128,12 +129,9 @@ export default class ArtisanProfiles extends React.Component {
       certificate: profile.cert_file
     });
     axios
-      .get(
-        "http://citiworksapi.test/api/admins/artisan/" + profile.artisan_id,
-        {
-          headers: headers
-        }
-      )
+      .get(Domain + "api/admins/artisan/" + profile.artisan_id, {
+        headers: headers
+      })
       .then(response => {
         this.setState({
           artisan: response.data.artisan
@@ -155,12 +153,9 @@ export default class ArtisanProfiles extends React.Component {
     console.log(`active page is ${value}`);
     // this.setState({ activePage: page });
     axios
-      .get(
-        "http://citiworksapi.test/api/admins/artisan-profiles?page=" + value,
-        {
-          headers: headers
-        }
-      )
+      .get(Domain + "api/admins/artisan-profiles?page=" + value, {
+        headers: headers
+      })
       .then(response => {
         this.setState({
           profiles: response.data.artisanprofiles.data,

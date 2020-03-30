@@ -24,6 +24,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
 import copy from "copy-to-clipboard";
+import Domain from "components/Constants/Keys";
 
 const styles = {
   cardCategoryWhite: {
@@ -89,7 +90,7 @@ export default class Clients extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/users", {
+      .get(Domain + "api/admins/users", {
         headers: headers
       })
       .then(response => {
@@ -139,7 +140,7 @@ export default class Clients extends React.Component {
     console.log(`active page is ${value}`);
     // this.setState({ activePage: page });
     axios
-      .get("http://citiworksapi.test/api/admins/users?page=" + value, {
+      .get(Domain + "api/admins/users?page=" + value, {
         headers: headers
       })
       .then(response => {

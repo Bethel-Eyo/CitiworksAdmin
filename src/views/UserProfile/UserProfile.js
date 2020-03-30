@@ -14,6 +14,7 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import axios from "axios";
 import TextField from "@material-ui/core/TextField";
+import Domain from "components/Constants/Keys";
 
 import avatar from "assets/img/faces/marc.jpg";
 
@@ -105,7 +106,7 @@ export default class UserProfile extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/admin-profile", {
+      .get(Domain + "api/admins/admin-profile", {
         headers: headers
       })
       .then(response => {
@@ -133,13 +134,9 @@ export default class UserProfile extends React.Component {
       email: this.state.email
     };
     axios
-      .post(
-        "http://citiworksapi.test/api/admins/update-admin/" + this.state.id,
-        admin,
-        {
-          headers: headers
-        }
-      )
+      .post(Domain + "api/admins/update-admin/" + this.state.id, admin, {
+        headers: headers
+      })
       .then(response => {
         alert(response.data.message);
         this.updateAdminProfile(headers);
@@ -157,8 +154,7 @@ export default class UserProfile extends React.Component {
     };
     axios
       .post(
-        "http://citiworksapi.test/api/admins/update-admin-profile/" +
-          this.state.id,
+        Domain + "api/admins/update-admin-profile/" + this.state.id,
         adminProfile,
         {
           headers: headers
@@ -185,7 +181,7 @@ export default class UserProfile extends React.Component {
     };
     axios
       .post(
-        "http://citiworksapi.test/api/admins/change-password/" + this.state.id,
+        Domain + "api/admins/change-password/" + this.state.id,
         adminPassword,
         {
           headers: headers

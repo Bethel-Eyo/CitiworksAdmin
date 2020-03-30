@@ -27,6 +27,7 @@ import styles from "assets/jss/material-dashboard-react/views/loginPage.js";
 
 import image from "assets/img/bg7.jpg";
 import Admin from "layouts/Admin";
+import Domain from "components/Constants/Keys";
 
 const useStyles = makeStyles(styles);
 // function intialize() {}
@@ -43,10 +44,10 @@ export default class LoginPage extends Component {
 
   handleLogin = e => {
     e.preventDefault();
-    // alert(this.state.auth.password);
+    // alert(Domain);
     let history = createBrowserHistory();
     axios
-      .post("http://citiworksapi.test/api/admin-login", this.state.auth)
+      .post(Domain + "api/admin-login", this.state.auth)
       .then(response => {
         let appState = {
           isLoggedIn: true,

@@ -11,6 +11,9 @@ import CardBody from "components/Card/CardBody.js";
 import axios from "axios";
 import { Pagination } from "@material-ui/lab";
 import CardFooter from "components/Card/CardFooter";
+import { TextField } from "@material-ui/core";
+import Button from "components/CustomButtons/Button.js";
+import Domain from "components/Constants/Keys";
 
 const styles = {
   cardCategoryWhite: {
@@ -54,7 +57,9 @@ export default class ClientProfiles extends React.Component {
       totalItemsCount: 1,
       pageRangeDisplayed: 3,
       token: "",
-      page: 1
+      page: 1,
+      pastedID: "",
+      activateFindById: false
     };
   }
 
@@ -64,7 +69,7 @@ export default class ClientProfiles extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/user-profiles", {
+      .get(Domain + "api/admins/user-profiles", {
         headers: headers
       })
       .then(response => {
@@ -98,6 +103,32 @@ export default class ClientProfiles extends React.Component {
     return page + 1;
   }
 
+  handleIDChange = name => ({ target: { value } }) => {
+    this.setState({
+      [name]: value
+    });
+  };
+
+  findArtisanById = () => {
+    // alert(this.state.pastedID);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
+    axios
+      .get(Domain + "api/admins/find-client-by-id/" + this.state.pastedID, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          profiles: response.data.profile
+        });
+      })
+      .catch(error => {
+        alert("An error occured while finding artisan " + error.message);
+      });
+  };
+
   handleChange(event, value) {
     this.setPage(value);
     // alert(value);
@@ -108,7 +139,7 @@ export default class ClientProfiles extends React.Component {
     console.log(`active page is ${value}`);
     // this.setState({ activePage: page });
     axios
-      .get("http://citiworksapi.test/api/admins/user-profiles?page=" + value, {
+      .get(Domain + "api/admins/user-profiles?page=" + value, {
         headers: headers
       })
       .then(response => {
@@ -126,11 +157,37 @@ export default class ClientProfiles extends React.Component {
   };
 
   render() {
-    const { page } = this.state;
+    const { page, pastedID } = this.state;
 
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
+          {/* <form className={this.classes.form} onSubmit={this.findArtisanById}> */}
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={2} />
+            <GridItem xs={12} sm={12} md={2} />
+            <GridItem xs={12} sm={12} md={5}>
+              <TextField
+                id="pastedID"
+                label="Paste Client ID"
+                variant="outlined"
+                style={{ width: "100%" }}
+                onChange={this.handleIDChange("pastedID")}
+                value={pastedID}
+              />
+            </GridItem>
+            <GridItem xs={12} sm={12} md={3}>
+              <Button
+                variant="contained"
+                color="danger"
+                onClick={this.findArtisanById}
+                component="span"
+              >
+                Find Profile by ID
+              </Button>
+            </GridItem>
+          </GridContainer>
+          {/* </form> */}
           <Card>
             <CardHeader color="primary">
               <h4 className={this.classes.cardTitleWhite}>

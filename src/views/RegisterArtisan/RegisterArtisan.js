@@ -23,6 +23,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import avatar from "assets/img/faces/marc.jpg";
 import CircularIndeterminate from "components/Specials/CircularProgress";
 import Domain from "components/Constants/Keys";
+import NigerianStates from "components/Constants/NigerianStates";
 
 const styles = {
   cardCategoryWhite: {
@@ -57,21 +58,6 @@ const genders = [
   {
     value: "Female",
     label: "Female"
-  }
-];
-
-const countries = [
-  {
-    value: " ",
-    label: " "
-  },
-  {
-    value: "Nigeria",
-    label: "Nigeria"
-  },
-  {
-    value: "other",
-    label: "Other"
   }
 ];
 
@@ -152,8 +138,8 @@ export default class RegisterArtisan extends React.Component {
     },
     phone_number: "",
     area: "",
-    city: "",
-    country: "",
+    street: "",
+    state: "",
     bank_name: "",
     gender: "",
     account_number: "",
@@ -167,7 +153,8 @@ export default class RegisterArtisan extends React.Component {
     dialog: false,
     messageTitle: "",
     messageBody: "",
-    isLoading: false
+    isLoading: false,
+    review: false
   };
 
   handleChange = name => ({ target: { value } }) => {
@@ -232,8 +219,8 @@ export default class RegisterArtisan extends React.Component {
   };
 
   registerArtisan = e => {
+    // alert(this.state.artisan.state);
     e.preventDefault();
-    // alert(this.state.artisan.country);
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + this.getToken()
@@ -263,7 +250,7 @@ export default class RegisterArtisan extends React.Component {
           messageBody: "An error occured on artisan create " + error.message,
           isLoading: false
         });
-        this.handleClickOpen();
+        //this.handleClickOpen();
         alert("An error occured on artisan create " + error.message);
       });
   };
@@ -272,8 +259,8 @@ export default class RegisterArtisan extends React.Component {
     const artisanProfile = {
       phone_number: this.state.phone_number,
       area: this.state.area,
-      city: this.state.city,
-      country: this.state.country,
+      street: this.state.street,
+      state: this.state.state,
       bank_name: this.state.bank_name,
       account_number: this.state.account_number,
       qualification: this.state.qualification,
@@ -339,8 +326,8 @@ export default class RegisterArtisan extends React.Component {
     const {
       phone_number,
       area,
-      city,
-      country,
+      street,
+      state,
       bank_name,
       account_number,
       qualification,
@@ -424,8 +411,29 @@ export default class RegisterArtisan extends React.Component {
                   <GridContainer>
                     <GridItem xs={12} sm={12} md={3}>
                       <TextField
+                        style={{ width: "100%" }}
+                        id="select_state"
+                        select
+                        label="Select State"
+                        value={state}
+                        onChange={this.handleProfileChange("state")}
+                        SelectProps={{
+                          native: true
+                        }}
+                        helperText="Select Country"
+                        variant="filled"
+                      >
+                        {NigerianStates.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </TextField>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={3}>
+                      <TextField
                         id="area"
-                        label="Area"
+                        label="LGA of residence"
                         variant="outlined"
                         style={{ width: "100%" }}
                         onChange={this.handleProfileChange("area")}
@@ -434,35 +442,15 @@ export default class RegisterArtisan extends React.Component {
                     </GridItem>
                     <GridItem xs={12} sm={12} md={3}>
                       <TextField
-                        id="city"
-                        label="City"
+                        id="street"
+                        label="Street of residence"
                         variant="outlined"
                         style={{ width: "100%" }}
-                        onChange={this.handleProfileChange("city")}
-                        value={city}
+                        onChange={this.handleProfileChange("street")}
+                        value={street}
                       />
                     </GridItem>
-                    <GridItem xs={12} sm={12} md={3}>
-                      <TextField
-                        style={{ width: "100%" }}
-                        id="select_country"
-                        select
-                        label="Country"
-                        value={country}
-                        onChange={this.handleProfileChange("country")}
-                        SelectProps={{
-                          native: true
-                        }}
-                        helperText="Select Country"
-                        variant="filled"
-                      >
-                        {countries.map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </TextField>
-                    </GridItem>
+
                     <GridItem xs={12} sm={12} md={3}>
                       <TextField
                         id="bank_name"

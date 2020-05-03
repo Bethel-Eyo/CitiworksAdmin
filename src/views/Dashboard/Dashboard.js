@@ -20,22 +20,33 @@ import axios from "axios";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { black } from "color-name";
+import Domain from "components/Constants/Keys";
 
 export default class Dashboard extends React.Component {
   state = {
     totalArtisans: 1,
     totalUsers: 1,
     totalJobs: 1,
+    totalCarpenters: 1,
+    totalPlumbers: 1,
+    totalElectricians: 1,
+    totalBricklayers: 1,
+    totalCleaners: 1,
+    totalPainters: 1,
     token: ""
   };
 
   componentDidMount() {
+    this.getAllTotals();
+  }
+
+  getAllTotals = () => {
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get("http://citiworksapi.test/api/admins/total-artisans", {
+      .get(Domain + "api/admins/total-artisans", {
         headers: headers
       })
       .then(response => {
@@ -45,7 +56,7 @@ export default class Dashboard extends React.Component {
         // alert("number of artisans: " + this.state.totalArtisans);
       });
     axios
-      .get("http://citiworksapi.test/api/admins/total-users", {
+      .get(Domain + "api/admins/total-users", {
         headers: headers
       })
       .then(response => {
@@ -54,7 +65,7 @@ export default class Dashboard extends React.Component {
         });
       });
     axios
-      .get("http://citiworksapi.test/api/admins/total-client-jobs", {
+      .get(Domain + "api/admins/total-client-jobs", {
         headers: headers
       })
       .then(response => {
@@ -62,7 +73,61 @@ export default class Dashboard extends React.Component {
           totalJobs: response.data.number
         });
       });
-  }
+    axios
+      .get(Domain + "api/admins/total-carpenters", {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          totalCarpenters: response.data.number
+        });
+      });
+    axios
+      .get(Domain + "api/admins/total-cleaners", {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          totalCleaners: response.data.number
+        });
+      });
+    axios
+      .get(Domain + "api/admins/total-electricians", {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          totalElectricians: response.data.number
+        });
+      });
+    axios
+      .get(Domain + "api/admins/total-plumbers", {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          totalPlumbers: response.data.number
+        });
+      });
+    axios
+      .get(Domain + "api/admins/total-painters", {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          totalPainters: response.data.number
+        });
+      });
+    axios
+      .get(Domain + "api/admins/total-bricklayers", {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          totalBricklayers: response.data.number
+        });
+      });
+  };
 
   getToken = () => {
     let state = localStorage["appState"];
@@ -147,6 +212,108 @@ export default class Dashboard extends React.Component {
               </CardIcon>
               <p style={styles.cardCategory}>Number of Artisans</p>
               <h3 style={styles.cardTitle}>{this.state.totalArtisans}</h3>
+            </CardHeader>
+            <CardFooter stats>
+              <div style={styles.stats}>
+                <Update />
+                Just Updated
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p style={styles.cardCategory}>Number of Carpenters</p>
+              <h3 style={styles.cardTitle}>{this.state.totalCarpenters}</h3>
+            </CardHeader>
+            <CardFooter stats>
+              <div style={styles.stats}>
+                <Update />
+                Just Updated
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p style={styles.cardCategory}>Number of Cleaners</p>
+              <h3 style={styles.cardTitle}>{this.state.totalCleaners}</h3>
+            </CardHeader>
+            <CardFooter stats>
+              <div style={styles.stats}>
+                <Update />
+                Just Updated
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p style={styles.cardCategory}>Number of Electricians</p>
+              <h3 style={styles.cardTitle}>{this.state.totalElectricians}</h3>
+            </CardHeader>
+            <CardFooter stats>
+              <div style={styles.stats}>
+                <Update />
+                Just Updated
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p style={styles.cardCategory}>Number of Plumbers</p>
+              <h3 style={styles.cardTitle}>{this.state.totalPlumbers}</h3>
+            </CardHeader>
+            <CardFooter stats>
+              <div style={styles.stats}>
+                <Update />
+                Just Updated
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p style={styles.cardCategory}>Number of Painters</p>
+              <h3 style={styles.cardTitle}>{this.state.totalPainters}</h3>
+            </CardHeader>
+            <CardFooter stats>
+              <div style={styles.stats}>
+                <Update />
+                Just Updated
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p style={styles.cardCategory}>Number of Bricklayers</p>
+              <h3 style={styles.cardTitle}>{this.state.totalBricklayers}</h3>
             </CardHeader>
             <CardFooter stats>
               <div style={styles.stats}>

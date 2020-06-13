@@ -51,7 +51,8 @@ export default class LoginPage extends Component {
       .then(response => {
         let appState = {
           isLoggedIn: true,
-          user_token: response.data.token
+          user_token: response.data.token,
+          admin_id: response.data.user.id
         };
         localStorage["appState"] = JSON.stringify(appState);
         // alert(appState.isLoggedIn);

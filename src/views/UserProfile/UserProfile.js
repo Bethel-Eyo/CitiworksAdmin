@@ -88,6 +88,16 @@ export default class UserProfile extends React.Component {
     return useStyles();
   };
 
+  getAdminId = () => {
+    let state = localStorage["appState"];
+    if (state) {
+      let AppState = JSON.parse(state);
+      if (AppState.isLoggedIn == true) {
+        return AppState.admin_id;
+      }
+    }
+  };
+
   getToken = () => {
     let state = localStorage["appState"];
     if (state) {
@@ -105,19 +115,21 @@ export default class UserProfile extends React.Component {
       "Content-Type": "application/json",
       Authorization: "Bearer " + this.getToken()
     };
+    console.log("bee: " + this.getAdminId());
     axios
-      .get(Domain + "api/admins/admin-profile", {
+      .get(Domain + "api/admins/admin-profile/" + this.getAdminId(), {
         headers: headers
       })
       .then(response => {
+        console.log(response.data.admin.first_name);
         this.setState({
-          first_name: response.data[0].admin.first_name,
-          last_name: response.data[0].admin.last_name,
-          email: response.data[0].admin.email,
-          position: response.data[0].position,
-          phone_number: response.data[0].phone_number,
-          gender: response.data[0].gender,
-          id: response.data[0].admin_id
+          first_name: response.data.admin.first_name,
+          last_name: response.data.admin.last_name,
+          email: response.data.admin.email,
+          position: response.data.admin.position,
+          phone_number: response.data.admin.phone_number,
+          gender: response.data.admin.gender,
+          id: response.data.admin.admin_id
         });
       });
   };

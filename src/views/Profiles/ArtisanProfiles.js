@@ -23,6 +23,7 @@ import TextField from "@material-ui/core/TextField";
 import CircularIndeterminate from "components/Specials/CircularProgress";
 import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
+import { createBrowserHistory } from "history";
 
 const styles = {
   cardCategoryWhite: {
@@ -94,10 +95,6 @@ export default class ArtisanProfiles extends React.Component {
     });
   };
 
-  updateArtisan = () => {
-    let artisanProfile = () => {};
-  };
-
   handleClose = () => {
     this.setState({
       dialog: false
@@ -105,6 +102,7 @@ export default class ArtisanProfiles extends React.Component {
   };
 
   componentDidMount() {
+    //this.getToken();
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + this.getToken()
@@ -127,15 +125,55 @@ export default class ArtisanProfiles extends React.Component {
       });
   }
 
+  decodeJwtToken = token => {
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    var jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(function(c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    //console.log("Jwt Decode" + jsonPayload);
+    return JSON.parse(jsonPayload);
+  };
+
+  handleLogout = () => {
+    let appState = {
+      isLoggedIn: false,
+      user: {}
+    };
+    // save app state with user date in local storage
+    localStorage["appState"] = JSON.stringify(appState);
+    let history = createBrowserHistory();
+    history.push("/login");
+    window.location.reload();
+  };
+
   getToken = () => {
     let state = localStorage["appState"];
     if (state) {
       let AppState = JSON.parse(state);
       if (AppState.isLoggedIn == true) {
-        this.setState({
-          token: AppState.user_token
-        });
-        return AppState.user_token;
+        let payload = {};
+        payload = this.decodeJwtToken(AppState.user_token);
+        if (payload.exp < Date.now() / 1000) {
+          console.log("Bethel! the token has expired");
+          this.handleLogout();
+        } else {
+          console.log(
+            "The token has not expired yet: " +
+              payload.exp +
+              " " +
+              Date.now() / 1000
+          );
+          this.setState({
+            token: AppState.user_token
+          });
+          return AppState.user_token;
+        }
       }
     }
   };

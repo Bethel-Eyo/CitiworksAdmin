@@ -14,6 +14,15 @@ import RecipeReviewCard from "components/Card/ComplexCard";
 import { Pagination } from "@material-ui/lab";
 import CardFooter from "components/Card/CardFooter";
 import Domain from "components/Constants/Keys";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from "@material-ui/core/TextField";
+import CircularIndeterminate from "components/Specials/CircularProgress";
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
 
 const styles = {
   cardCategoryWhite: {
@@ -53,8 +62,10 @@ export default class ArtisanProfiles extends React.Component {
     this.state = {
       profiles: [],
       message: "",
-      expanded: false,
       artisan: {},
+      expanded: false,
+      first_name: "",
+      last_name: "",
       address: "",
       bankName: "",
       qualification: "",
@@ -69,9 +80,29 @@ export default class ArtisanProfiles extends React.Component {
       totalItemsCount: 1,
       pageRangeDisplayed: 3,
       token: "",
-      page: 1
+      page: 1,
+      dialog: false,
+      isLoading: false,
+      tc: false,
+      artisanId: ""
     };
   }
+
+  handleProfileChange = name => ({ target: { value } }) => {
+    this.setState({
+      [name]: value
+    });
+  };
+
+  updateArtisan = () => {
+    let artisanProfile = () => {};
+  };
+
+  handleClose = () => {
+    this.setState({
+      dialog: false
+    });
+  };
 
   componentDidMount() {
     const headers = {
@@ -108,9 +139,8 @@ export default class ArtisanProfiles extends React.Component {
       }
     }
   };
-  a;
 
-  getDetails = profile => {
+  getDetails = (profile, type) => {
     // alert(id);
     const headers = {
       "Content-Type": "application/json",
@@ -125,8 +155,8 @@ export default class ArtisanProfiles extends React.Component {
       accountNo: profile.account_number,
       profilePix: profile.profile_picture,
       category: profile.category,
-      gender: profile.gender,
-      certificate: profile.cert_file
+      certificate: profile.cert_file,
+      artisanId: profile.artisan_id
     });
     axios
       .get(Domain + "api/admins/artisan/" + profile.artisan_id, {
@@ -134,7 +164,72 @@ export default class ArtisanProfiles extends React.Component {
       })
       .then(response => {
         this.setState({
-          artisan: response.data.artisan
+          artisan: response.data.artisan,
+          first_name: response.data.artisan.first_name,
+          last_name: response.data.artisan.last_name
+        });
+        if (type == "edit") {
+          this.setState({
+            dialog: true
+          });
+        }
+      });
+  };
+
+  showNotification = place => {
+    switch (place) {
+      case "tc":
+        if (!this.state.tc) {
+          this.setState({
+            tc: true
+          });
+          setTimeout(() => {
+            this.setState({
+              tc: false
+            });
+          }, 6000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  editArtisan = () => {
+    this.setState({
+      isLoading: true
+    });
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.getToken()
+    };
+    let handyman = {
+      id: this.state.artisanId,
+      first_name: this.state.first_name,
+      last_name: this.state.last_name,
+      address: this.state.address,
+      bank_name: this.state.bankName,
+      qualification: this.state.qualification,
+      phone_number: this.state.phoneNumber,
+      gender: this.state.gender,
+      account_number: this.state.accountNo,
+      category: this.state.category
+    };
+    axios
+      .post(Domain + "api/admins/edit-artisan", handyman, {
+        headers: headers
+      })
+      .then(response => {
+        this.setState({
+          isLoading: false
+        });
+        this.showNotification("tc");
+        window.location.reload();
+      })
+      .catch(error => {
+        alert("An error occurred" + error.message);
+        this.setState({
+          isLoading: false
         });
       });
   };
@@ -170,7 +265,21 @@ export default class ArtisanProfiles extends React.Component {
     return useStyles();
   };
   render() {
-    const { page } = this.state;
+    const {
+      page,
+      dialog,
+      address,
+      bankName,
+      qualification,
+      phoneNumber,
+      gender,
+      accountNo,
+      category,
+      first_name,
+      last_name,
+      tc
+    } = this.state;
+
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={8}>
@@ -190,7 +299,18 @@ export default class ArtisanProfiles extends React.Component {
                 tableData={this.state.profiles.map((profile, index) => [
                   profile.artisan_id,
                   profile.address,
-                  <Button color="rose" onClick={() => this.getDetails(profile)}>
+                  <Button
+                    color="danger"
+                    onClick={() => {
+                      this.getDetails(profile, "edit");
+                    }}
+                  >
+                    Edit
+                  </Button>,
+                  <Button
+                    color="rose"
+                    onClick={() => this.getDetails(profile, "details")}
+                  >
                     View Details
                   </Button>
                 ])}
@@ -228,6 +348,135 @@ export default class ArtisanProfiles extends React.Component {
             address={this.state.address}
           />
         </GridItem>
+        <div>
+          <Dialog
+            open={dialog}
+            onClose={this.handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Edit Artisan</DialogTitle>
+            <DialogContent>
+              <GridContainer>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="First name"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("first_name")}
+                    value={first_name}
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Last name"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("last_name")}
+                    value={last_name}
+                  />
+                </GridItem>
+              </GridContainer>
+              <br />
+              <GridContainer>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Address"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("address")}
+                    value={address}
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Category"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("category")}
+                    value={category}
+                  />
+                </GridItem>
+              </GridContainer>
+              <br />
+              <GridContainer>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Gender"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("gender")}
+                    value={gender}
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Account Number"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("accountNo")}
+                    value={accountNo}
+                  />
+                </GridItem>
+              </GridContainer>
+              <br />
+              <GridContainer>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Phone Number"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("phoneNumber")}
+                    value={phoneNumber}
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Qualification"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("qualification")}
+                    value={qualification}
+                  />
+                </GridItem>
+              </GridContainer>
+              <br />
+              <GridContainer>
+                <GridItem xs={12} sm={12} md={6}>
+                  <TextField
+                    label="Bank name"
+                    variant="outlined"
+                    style={{ width: "100%" }}
+                    onChange={this.handleProfileChange("bankName")}
+                    value={bankName}
+                  />
+                </GridItem>
+              </GridContainer>
+            </DialogContent>
+            <DialogActions>
+              {this.state.isLoading ? <CircularIndeterminate /> : null}
+              <Button onClick={this.handleClose} color="rose" autoFocus>
+                Cancel
+              </Button>
+              <Button onClick={this.editArtisan} color="primary" autoFocus>
+                Save Changes
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+        <Snackbar
+          place="tc"
+          color="rose"
+          icon={AddAlert}
+          message={"Artisan profile was updated successfully"}
+          open={tc}
+          closeNotification={() => {
+            this.setState({
+              tc: false
+            });
+          }}
+          close
+        />
       </GridContainer>
     );
   }

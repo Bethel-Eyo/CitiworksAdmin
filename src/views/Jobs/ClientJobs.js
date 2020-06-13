@@ -65,7 +65,7 @@ export default class ClientJobs extends React.Component {
       Authorization: "Bearer " + this.getToken()
     };
     axios
-      .get(Domain + "api/admins/user-jobs", {
+      .get(Domain + "api/admins/get-all-jobs", {
         headers: headers
       })
       .then(response => {

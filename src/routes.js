@@ -42,6 +42,7 @@ import ClientProfiles from "views/Profiles/ClientProfiles";
 import ArtisanProfiles from "views/Profiles/ArtisanProfiles";
 import RegisterArtisan from "views/RegisterArtisan/RegisterArtisan";
 import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
+import RegisterAdmin from "views/Admins/RegisterAdmin";
 
 const dashboardRoutes = [
   {
@@ -78,7 +79,7 @@ const dashboardRoutes = [
   },
   {
     path: "/client-jobs",
-    name: "Client Jobs",
+    name: "Jobs",
     rtlName: "قائمة الجدول",
     icon: "rowing",
     component: ClientJobs,
@@ -108,14 +109,14 @@ const dashboardRoutes = [
     component: ArtisanTransactions,
     layout: "/admin"
   },
-  {
-    path: "/artisan-jobs",
-    name: "Artisan Jobs",
-    rtlName: "قائمة الجدول",
-    icon: "rowing",
-    component: ArtisanJobs,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/artisan-jobs",
+  //   name: "Artisan Jobs",
+  //   rtlName: "قائمة الجدول",
+  //   icon: "rowing",
+  //   component: ArtisanJobs,
+  //   layout: "/admin"
+  // },
   {
     path: "/register-artisan",
     name: "Register Artisan",
@@ -127,11 +128,17 @@ const dashboardRoutes = [
   {
     path: "/user",
     name: "Admin Profile",
-    rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
     component: UserProfile,
     layout: "/admin"
   },
+  {
+    path: "/register-new-admin",
+    name: "Create New Admin",
+    icon: Person,
+    component: RegisterAdmin,
+    layout: "/admin"
+  }
   // {
   //   path: "/table",
   //   name: "Table List",
@@ -164,14 +171,14 @@ const dashboardRoutes = [
   //   component: Maps,
   //   layout: "/admin"
   // },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    rtlName: "إخطارات",
-    icon: Notifications,
-    component: NotificationsPage,
-    layout: "/admin"
-  }
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   rtlName: "إخطارات",
+  //   icon: Notifications,
+  //   component: NotificationsPage,
+  //   layout: "/admin"
+  // }
   // {
   //   path: "/rtl-page",
   //   name: "RTL Support",

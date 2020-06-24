@@ -19,7 +19,6 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-
 import avatar from "assets/img/faces/marc.jpg";
 import CircularIndeterminate from "components/Specials/CircularProgress";
 import Domain from "components/Constants/Keys";
@@ -189,8 +188,9 @@ export default class RegisterArtisan extends React.Component {
         imagePreviewUrl: reader.result
       });
     };
-
-    reader.readAsDataURL(event.target.files[0]);
+    try {
+      reader.readAsDataURL(event.target.files[0]);
+    } catch (error) {}
   };
 
   fileUploadHandler = event => {
@@ -206,7 +206,9 @@ export default class RegisterArtisan extends React.Component {
       });
     };
 
-    reader.readAsDataURL(event.target.files[0]);
+    try {
+      reader.readAsDataURL(event.target.files[0]);
+    } catch (error) {}
   };
 
   decodeJwtToken = token => {

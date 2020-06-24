@@ -241,18 +241,11 @@ export default class ClientProfiles extends React.Component {
             <CardBody>
               <Table
                 tableHeaderColor="primary"
-                tableHead={[
-                  "User id",
-                  "Phone Number",
-                  "address",
-                  "picture-link",
-                  "gender"
-                ]}
+                tableHead={["User id", "Phone Number", "address", "gender"]}
                 tableData={this.state.profiles.map((profile, index) => [
                   profile.user_id,
                   profile.phone_number,
                   profile.address,
-                  profile.profile_picture,
                   profile.gender
                 ])}
               />

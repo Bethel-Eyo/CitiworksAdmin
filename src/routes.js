@@ -43,6 +43,7 @@ import ArtisanProfiles from "views/Profiles/ArtisanProfiles";
 import RegisterArtisan from "views/RegisterArtisan/RegisterArtisan";
 import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
 import RegisterAdmin from "views/Admins/RegisterAdmin";
+import Payments from "views/Payments/Payments";
 
 const dashboardRoutes = [
   {
@@ -109,14 +110,13 @@ const dashboardRoutes = [
     component: ArtisanTransactions,
     layout: "/admin"
   },
-  // {
-  //   path: "/artisan-jobs",
-  //   name: "Artisan Jobs",
-  //   rtlName: "قائمة الجدول",
-  //   icon: "rowing",
-  //   component: ArtisanJobs,
-  //   layout: "/admin"
-  // },
+  {
+    path: "/payments-requests",
+    name: "Payment Requests",
+    icon: "rowing",
+    component: Payments,
+    layout: "/admin"
+  },
   {
     path: "/register-artisan",
     name: "Register Artisan",
